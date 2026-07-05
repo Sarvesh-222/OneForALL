@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>FreshMart - Shopkeeper Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shopkeeper.css">
+    <link rel="stylesheet" href="shopkeeper-login.css">
+</head>
+<body class="dashboard-hidden">
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div class="login-screen" id="loginScreen">
+    <!-- Floating decorative circles -->
+    <div class="login-decoration">
+        <div class="float-circle float-circle-1"></div>
+        <div class="float-circle float-circle-2"></div>
+        <div class="float-circle float-circle-3"></div>
+        <div class="float-circle float-circle-4"></div>
+        <div class="float-circle float-circle-5"></div>
+    </div>
+
+    <div class="login-container">
+        <!-- Left: Brand Panel -->
+        <div class="login-brand-panel">
+            <div class="brand-logo-large"><i class="fa-solid fa-leaf"></i></div>
+            <div class="brand-name-large">FreshMart</div>
+            <div class="brand-tagline">Your one-stop shopkeeper dashboard to manage inventory, orders & earnings</div>
+            <div class="brand-features">
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <span>Real-time inventory management</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <span>Track & manage all orders</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <span>Detailed earnings & analytics</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                    <span>Live delivery status updates</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Login Form -->
+        <div class="login-form-panel">
+            <div class="login-form-wrapper">
+                <div class="login-greeting">Welcome back! 👋</div>
+                <div class="login-subtitle">Sign in to your shopkeeper dashboard to manage your store.</div>
+
+                <div class="login-error" id="loginError">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="loginErrorText">Invalid credentials</span>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="login-form-group">
+                        <label for="loginEmail">Email or Store ID</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-store"></i>
+                            <input type="text" id="loginEmail" placeholder="e.g. ramesh@freshmart.in" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Show password">
+                                <i class="fa-solid fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="login-options">
+                        <label class="remember-wrap">
+                            <input type="checkbox" id="rememberMe">
+                            <span>Remember me</span>
+                        </label>
+                        <a class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span class="btn-text"><i class="fa-solid fa-right-to-bracket"></i> Sign In</span>
+                        <div class="btn-spinner"></div>
+                    </button>
+                </form>
+
+                <div class="login-divider">or</div>
+
+                <div class="login-footer-text">
+                    New to FreshMart? <a onclick="openRegisterModal()">Register your store</a>
+                </div>
+
+                <div class="demo-hint">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <div class="demo-hint-content">
+                        <strong>Demo:</strong> Use <strong>admin</strong> / <strong>admin</strong> to explore the dashboard
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ REGISTRATION MODAL ══════════════ -->
+<div class="login-screen" id="registerScreen" style="display:none; z-index: 9998;">
+    <div class="login-container">
+        <!-- Left: Brand Panel -->
+        <div class="login-brand-panel">
+            <div class="brand-logo-large"><i class="fa-solid fa-leaf"></i></div>
+            <div class="brand-name-large">FreshMart</div>
+            <div class="brand-tagline">Register your store and start managing orders today</div>
+            <div class="brand-features">
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <span>Manage inventory easily</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <span>Track customer orders</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <span>Grow your business</span>
+                </div>
+                <div class="brand-feature">
+                    <div class="brand-feature-icon"><i class="fa-solid fa-user-check"></i></div>
+                    <span>Build customer trust</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Register Form -->
+        <div class="login-form-panel">
+            <div class="login-form-wrapper">
+                <div class="login-greeting">Create Your Store 🏪</div>
+                <div class="login-subtitle">Join FreshMart and start managing your shop today</div>
+
+                <div class="login-error" id="registerError" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="registerErrorText">Registration failed</span>
+                </div>
+
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="login-form-group">
+                        <label for="registerName">Shop Name</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-store"></i>
+                            <input type="text" id="registerName" placeholder="e.g. Ramesh Kirana Store" required>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="registerEmail">Email Address</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" id="registerEmail" placeholder="e.g. ramesh@freshmart.in" required>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="registerPhone">Phone Number</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-phone"></i>
+                            <input type="tel" id="registerPhone" placeholder="e.g. 9999999999" required>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="registerPassword">Password</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="registerPassword" placeholder="Create a password" required>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="registerConfirmPassword">Confirm Password</label>
+                        <div class="login-input-wrap">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="registerConfirmPassword" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="registerBtn">
+                        <span class="btn-text"><i class="fa-solid fa-user-plus"></i> Create Account</span>
+                        <div class="btn-spinner"></div>
+                    </button>
+                </form>
+
+                <div class="login-divider">or</div>
+
+                <div class="login-footer-text">
+                    Already have a store? <a onclick="closeRegisterModal()">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<header class="navbar">
+    <div class="logo"><i class="fa-solid fa-leaf"></i> FreshMart</div>
+    <div class="store-badge"><i class="fa-solid fa-store"></i> Ramesh Kirana</div>
+    <div class="navbar-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search inventory, orders..." oninput="handleSearch(this.value)">
+    </div>
+    <div class="nav-actions">
+        <div class="notification-btn" onclick="switchTab('active')" title="Active orders">
+            <i class="fa-solid fa-bell"></i>
+            <div class="notif-count" id="notifCount">0</div>
+        </div>
+        <div class="profile-dropdown-wrap" id="profileDropdownWrap">
+            <div class="profile-pic" onclick="toggleProfileMenu(event)" title="Account menu">R</div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-dropdown-header">
+                    <div class="profile-dropdown-avatar">R</div>
+                    <div>
+                        <div class="profile-dropdown-name" id="profileShopName">Ramesh Kirana</div>
+                        <div class="profile-dropdown-email" id="profileEmail">admin</div>
+                    </div>
+                </div>
+                <div class="profile-dropdown-divider"></div>
+                <div class="profile-dropdown-item" onclick="openShopNameModal()">
+                    <i class="fa-solid fa-store"></i> Change Shop Name
+                </div>
+                <div class="profile-dropdown-item" onclick="openCredentialsModal()">
+                    <i class="fa-solid fa-key"></i> Change ID / Password
+                </div>
+                <div class="profile-dropdown-divider"></div>
+                <div class="profile-dropdown-item profile-dropdown-danger" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══════════════ SHOP NAME MODAL ══════════════ -->
+<div class="modal-overlay" id="shopNameModal" onclick="closeShopNameModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width:440px;">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-store"></i> Change Shop Name</h3>
+            <button class="modal-close" onclick="closeShopNameModal(event)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="display:block;">
+            <div class="form-group">
+                <label for="newShopName">New Shop Name</label>
+                <input type="text" id="newShopName" class="form-control" placeholder="e.g. Ramesh Kirana Store" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-footer-left"></div>
+            <div class="modal-footer-right">
+                <button type="button" class="btn btn-secondary" onclick="closeShopNameModal(event)">Cancel</button>
+                <button type="button" class="btn btn-accept" onclick="saveShopName()">Save Name</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ CREDENTIALS MODAL ══════════════ -->
+<div class="modal-overlay" id="credentialsModal" onclick="closeCredentialsModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width:440px;">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-key"></i> Change ID / Password</h3>
+            <button class="modal-close" onclick="closeCredentialsModal(event)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="display:block;">
+            <div class="form-group" style="margin-bottom:1rem;">
+                <label for="newLoginId">New Login ID</label>
+                <input type="text" id="newLoginId" class="form-control" placeholder="e.g. ramesh@freshmart.in">
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-control" placeholder="Re-enter new password">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-footer-left"></div>
+            <div class="modal-footer-right">
+                <button type="button" class="btn btn-secondary" onclick="closeCredentialsModal(event)">Cancel</button>
+                <button type="button" class="btn btn-accept" onclick="saveCredentials()">Update Credentials</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ LAYOUT ══════════════ -->
+<div class="dashboard-container">
+
+    <!-- ── SIDEBAR (desktop) ── -->
+    <aside class="sidebar">
+        <div class="sidebar-title">Menu</div>
+
+        <div class="nav-item active" data-tab="inventory" onclick="switchTab('inventory')">
+            <i class="fa-solid fa-box-open"></i> Inventory
+        </div>
+        <div class="nav-item" data-tab="orders" onclick="switchTab('orders')">
+            <i class="fa-solid fa-receipt"></i> All Orders
+        </div>
+        <div class="nav-item" data-tab="earnings" onclick="switchTab('earnings')">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Earnings
+        </div>
+        <div class="nav-item" data-tab="active" onclick="switchTab('active')">
+            <i class="fa-solid fa-truck-fast"></i> Active Orders
+            <span class="nav-badge" id="sideNavBadge">0</span>
+        </div>
+
+        <hr class="sidebar-divider">
+
+        <div class="stats-mini">
+            <div class="stats-mini-label">Today's Earnings</div>
+            <div class="stats-mini-value" id="sidebarEarnings">₹0</div>
+            <div class="stats-mini-sub" id="sidebarOrderCount">0 delivered</div>
+        </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-content">
+
+        <!-- ── TAB 1: INVENTORY ── -->
+        <div id="inventoryTab" class="tab-content active">
+            <div class="section-header">
+                <div>
+                    <h2>All Items</h2>
+                    <div class="section-header-meta">Manage your product catalogue & stock</div>
+                </div>
+                <div style="display: flex; gap: 0.8rem; align-items: center;">
+                    <button class="btn btn-accept" onclick="openAddModal()" style="padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; height: 38px;">
+                        <i class="fa-solid fa-plus"></i> Add Item
+                    </button>
+                    <div class="sort-by" id="stockFilterBtn" onclick="cycleStockFilter()" style="height: 38px; display: flex; align-items: center;">
+                        All Items <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="product-grid" id="inventoryGrid"></div>
+        </div>
+
+        <!-- ── TAB 2: ALL ORDERS ── -->
+        <div id="ordersTab" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>All Orders Received</h2>
+                    <div class="section-header-meta">Sorted by most recent first</div>
+                </div>
+            </div>
+            <div class="filter-row" id="orderFilterRow">
+                <div class="filter-pill active" data-filter="all" onclick="setOrderFilter('all', this)">All</div>
+                <div class="filter-pill" data-filter="Pending" onclick="setOrderFilter('Pending', this)">Pending</div>
+                <div class="filter-pill" data-filter="Accepted" onclick="setOrderFilter('Accepted', this)">Accepted</div>
+                <div class="filter-pill" data-filter="Delivered" onclick="setOrderFilter('Delivered', this)">Delivered</div>
+                <div class="filter-pill" data-filter="Rejected" onclick="setOrderFilter('Rejected', this)">Rejected</div>
+            </div>
+            <div class="orders-list" id="ordersList"></div>
+        </div>
+
+        <!-- ── TAB 3: EARNINGS ── -->
+        <div id="earningsTab" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Earnings</h2>
+                    <div class="section-header-meta">Total revenue from delivered orders</div>
+                </div>
+            </div>
+            <div id="earningsContent"></div>
+        </div>
+
+        <!-- ── TAB 4: ACTIVE ORDERS ── -->
+        <div id="activeTab" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Active Orders</h2>
+                    <div class="section-header-meta">Manage pending & in-progress orders</div>
+                </div>
+            </div>
+            <div class="orders-list" id="activeList"></div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══════════════ MOBILE BOTTOM NAV ══════════════ -->
+<nav class="mobile-nav">
+    <div class="mobile-nav-item active" data-tab="inventory" onclick="switchTab('inventory')">
+        <i class="fa-solid fa-box-open"></i>
+        <div class="mobile-nav-label">Inventory</div>
+    </div>
+    <div class="mobile-nav-item" data-tab="orders" onclick="switchTab('orders')">
+        <i class="fa-solid fa-receipt"></i>
+        <div class="mobile-nav-label">Orders</div>
+    </div>
+    <div class="mobile-nav-item" data-tab="earnings" onclick="switchTab('earnings')">
+        <i class="fa-solid fa-rupee-sign"></i>
+        <div class="mobile-nav-label">Earnings</div>
+    </div>
+    <div class="mobile-nav-item" data-tab="active" onclick="switchTab('active')">
+        <i class="fa-solid fa-truck-fast"></i>
+        <div class="mobile-nav-label">Active</div>
+        <div class="mobile-nav-badge" id="mobileNavBadge">0</div>
+    </div>
+</nav>
+
+<!-- ══════════════ ADD/EDIT PRODUCT MODAL ══════════════ -->
+<div class="modal-overlay" id="productModal" onclick="closeProductModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modalTitle"><i class="fa-solid fa-box-open"></i> Add New Product</h3>
+            <button class="modal-close" onclick="closeProductModal(event)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <!-- Form Column -->
+            <form class="form-col" id="productForm" onsubmit="handleProductSubmit(event)">
+                <input type="hidden" id="productId">
+                
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" class="form-control" placeholder="e.g. Fresh Tomatoes" required oninput="updateLivePreview()">
+                </div>
+                
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="productPrice">Price (₹)</label>
+                        <input type="number" id="productPrice" class="form-control" placeholder="e.g. 40" min="0" required oninput="updateLivePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label for="productQty">Available Stock</label>
+                        <input type="number" id="productQty" class="form-control" placeholder="e.g. 25" min="0" required oninput="updateLivePreview()">
+                    </div>
+                </div>
+                
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="productUnit">Unit</label>
+                        <select id="productUnit" class="form-control" required onchange="updateLivePreview()">
+                            <option value="kg">kg (Kilogram)</option>
+                            <option value="litre">litre (Litre)</option>
+                            <option value="packet">packet (Packet)</option>
+                            <option value="piece">piece (Piece)</option>
+                            <option value="dozen">dozen (Dozen)</option>
+                            <option value="gram">gram (Gram)</option>
+                            <option value="ml">ml (Milliliter)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productEmojiInput">Custom Emoji</label>
+                        <input type="text" id="productEmojiInput" class="form-control" placeholder="e.g. 🍅" maxlength="4" oninput="selectCustomEmoji(this.value)">
+                    </div>
+                </div>
+
+                <!-- Image Upload Section -->
+                <div class="form-group">
+                    <label>Product Image <span style="text-transform:none;font-weight:500;color:var(--text-muted);">(optional)</span></label>
+                    <input type="file" id="productImageInput" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
+                    <div class="image-upload-zone" id="imageUploadZone" onclick="document.getElementById('productImageInput').click()">
+                        <div class="image-upload-placeholder" id="imageUploadPlaceholder">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click or drag an image here</span>
+                            <span class="image-upload-hint">JPG, PNG, WEBP — max 2 MB</span>
+                        </div>
+                        <div class="image-upload-preview" id="imageUploadPreview" style="display:none;">
+                            <img id="imagePreviewImg" src="" alt="Preview">
+                            <button type="button" class="image-remove-btn" onclick="removeProductImage(event)" title="Remove image">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group emoji-selector-wrapper">
+                    <label>Fallback Icon <span style="text-transform:none;font-weight:500;color:var(--text-muted);">(used if no image)</span></label>
+                    <div class="emoji-grid" id="modalEmojiGrid">
+                        <div class="emoji-btn selected" onclick="selectSuggestedEmoji('🍎', this)">🍎</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🥦', this)">🥦</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🥛', this)">🥛</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🍞', this)">🍞</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🥚', this)">🥚</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🍚', this)">🍚</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🫘', this)">🫘</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🍬', this)">🍬</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🫒', this)">🫒</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('☕', this)">☕</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🧈', this)">🧈</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🧂', this)">🧂</div>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Live Preview Column -->
+            <div class="preview-col">
+                <div class="preview-label">Live Preview</div>
+                <div id="livePreviewContainer">
+                    <!-- Dynamic preview loaded by JS -->
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-footer-left">
+                <button type="button" class="btn btn-delete" id="deleteProductBtn" onclick="handleProductDelete()" style="display: none;">
+                    <i class="fa-solid fa-trash-can"></i> Delete Product
+                </button>
+            </div>
+            <div class="modal-footer-right">
+                <button type="button" class="btn btn-secondary" onclick="closeProductModal(event)">Cancel</button>
+                <button type="submit" form="productForm" class="btn btn-accept" id="saveProductBtn">Save Product</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="shopkeeper-login.js"></script>
+<script src="shopkeeper.js"></script>
+</body>
+</html>

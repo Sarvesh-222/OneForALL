@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>FreshMart - Premium Grocery Delivery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <button class="mobile-filter-btn" title="Filters"><i class="fa-solid fa-bars"></i></button>
+            <i class="fa-solid fa-leaf"></i> FreshMart
+        </div>
+        <div class="search-bar">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" placeholder="Search for groceries...">
+        </div>
+        <div class="nav-actions">
+            <div class="track-icon" id="open-tracking-btn" style="display: none;" title="Track Delivery">
+                <i class="fa-solid fa-map-location-dot"></i> <span class="icon-text">Track Order</span>
+            </div>
+            <div class="cart-icon" id="cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i> <span class="icon-text">Cart</span>
+                <span class="cart-badge" id="cart-badge">0</span>
+            </div>
+            <div class="profile-pic"></div>
+        </div>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <main class="dashboard-container">
+        <!-- Sidebar Filters -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="filter-title">Filters</h2>
+                <button class="close-sidebar-btn" id="close-sidebar-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="filter-section">
+                <h3>Categories <i class="fa-solid fa-chevron-down"></i></h3>
+                <ul class="filter-list" id="category-filters">
+                    <li><label><input type="checkbox" value="Fruits" class="filter-cb"> Fruits</label></li>
+                    <li><label><input type="checkbox" value="Vegetables" class="filter-cb"> Vegetables</label></li>
+                    <li><label><input type="checkbox" value="Dairy & Eggs" class="filter-cb"> Dairy & Eggs</label></li>
+                    <li><label><input type="checkbox" value="Bakery" class="filter-cb"> Bakery</label></li>
+                </ul>
+            </div>
+            
+            <div class="filter-section">
+                <h3>Dietary <i class="fa-solid fa-chevron-down"></i></h3>
+                <ul class="filter-list" id="dietary-filters">
+                    <li><label><input type="checkbox" value="Organic" class="filter-cb"> Organic</label></li>
+                    <li><label><input type="checkbox" value="Vegan" class="filter-cb"> Vegan</label></li>
+                    <li><label><input type="checkbox" value="Gluten-Free" class="filter-cb"> Gluten-Free</label></li>
+                </ul>
+            </div>
+            
+            <div class="filter-section">
+                <h3>Price <i class="fa-solid fa-chevron-down"></i></h3>
+                <ul class="filter-list" id="price-filters">
+                    <li><label><input type="radio" name="price" value="all" class="filter-cb" checked> All Prices</label></li>
+                    <li><label><input type="radio" name="price" value="under-100" class="filter-cb"> Under ₹100</label></li>
+                    <li><label><input type="radio" name="price" value="100-200" class="filter-cb"> ₹100 - ₹200</label></li>
+                    <li><label><input type="radio" name="price" value="over-200" class="filter-cb"> Over ₹200</label></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Product Grid -->
+        <section class="products-section">
+            <div class="section-header">
+                <h2>Fresh Arrivals</h2>
+                <div class="sort-by">
+                    Sort by Relevance <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
+            
+            <div class="product-grid" id="product-grid">
+                <!-- Products injected by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Cart Sidebar Overlay -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-sidebar">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-btn" id="close-cart"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="cart-items" id="cart-items">
+                <!-- Cart items injected by JS -->
+                <div class="empty-cart-msg">Your cart is empty.</div>
+            </div>
+            
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">₹0.00</span>
+                </div>
+                <button class="checkout-btn" id="checkout-btn">
+                    <span class="btn-text">Pay Now</span>
+                    <div class="btn-loader"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div class="tracking-modal" id="tracking-modal">
+        <div class="modal-content">
+            <button class="close-btn" id="close-tracking"><i class="fa-solid fa-xmark"></i></button>
+            <h2>Delivery Tracking</h2>
+            <div class="tracking-status">
+                <div class="status-step active"><i class="fa-solid fa-check"></i> Order Placed</div>
+                <div class="status-step active"><i class="fa-solid fa-box"></i> Packed</div>
+                <div class="status-step active pulse"><i class="fa-solid fa-truck"></i> On the Way</div>
+                <div class="status-step"><i class="fa-solid fa-house"></i> At your Doorstep</div>
+            </div>
+            <div class="map-container" id="map" style="width: 100%; height: 250px;">
+                <!-- Map injected by JS -->
+            </div>
+            <div class="delivery-eta" style="margin-top: 10px;">
+                <span id="status-text">Preparing Order</span>
+                <strong id="dist-text">Calculating...</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script_v3.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3W4Phsr1JeWZMgV68tZlFIKI8QXVbIww&callback=initMap&libraries=places&v=weekly" defer></script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>FreshMart - Shopkeeper Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="shopkeeper.css">
+</head>
+<body>
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<header class="navbar">
+    <div class="logo"><i class="fa-solid fa-leaf"></i> FreshMart</div>
+    <div class="store-badge"><i class="fa-solid fa-store"></i> Ramesh Kirana</div>
+    <div class="navbar-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search inventory, orders..." oninput="handleSearch(this.value)">
+    </div>
+    <div class="nav-actions">
+        <div class="notification-btn" onclick="switchTab('active')" title="Active orders">
+            <i class="fa-solid fa-bell"></i>
+            <div class="notif-count" id="notifCount">0</div>
+        </div>
+        <div class="profile-pic">R</div>
+    </div>
+</header>
+
+<!-- ══════════════ LAYOUT ══════════════ -->
+<div class="dashboard-container">
+
+    <!-- ── SIDEBAR (desktop) ── -->
+    <aside class="sidebar">
+        <div class="sidebar-title">Menu</div>
+
+        <div class="nav-item active" data-tab="inventory" onclick="switchTab('inventory')">
+            <i class="fa-solid fa-box-open"></i> Inventory
+        </div>
+        <div class="nav-item" data-tab="orders" onclick="switchTab('orders')">
+            <i class="fa-solid fa-receipt"></i> All Orders
+        </div>
+        <div class="nav-item" data-tab="earnings" onclick="switchTab('earnings')">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Earnings
+        </div>
+        <div class="nav-item" data-tab="active" onclick="switchTab('active')">
+            <i class="fa-solid fa-truck-fast"></i> Active Orders
+            <span class="nav-badge" id="sideNavBadge">0</span>
+        </div>
+
+        <hr class="sidebar-divider">
+
+        <div class="stats-mini">
+            <div class="stats-mini-label">Today's Earnings</div>
+            <div class="stats-mini-value" id="sidebarEarnings">₹0</div>
+            <div class="stats-mini-sub" id="sidebarOrderCount">0 delivered</div>
+        </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-content">
+
+        <!-- ── TAB 1: INVENTORY ── -->
+        <div id="inventoryTab" class="tab-content active">
+            <div class="section-header">
+                <div>
+                    <h2>All Items</h2>
+                    <div class="section-header-meta">Manage your product catalogue & stock</div>
+                </div>
+                <div style="display: flex; gap: 0.8rem; align-items: center;">
+                    <button class="btn btn-accept" onclick="openAddModal()" style="padding: 0.5rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; height: 38px;">
+                        <i class="fa-solid fa-plus"></i> Add Item
+                    </button>
+                    <div class="sort-by" id="stockFilterBtn" onclick="cycleStockFilter()" style="height: 38px; display: flex; align-items: center;">
+                        All Items <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="product-grid" id="inventoryGrid"></div>
+        </div>
+
+        <!-- ── TAB 2: ALL ORDERS ── -->
+        <div id="ordersTab" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>All Orders Received</h2>
+                    <div class="section-header-meta">Sorted by most recent first</div>
+                </div>
+            </div>
+            <div class="filter-row" id="orderFilterRow">
+                <div class="filter-pill active" data-filter="all" onclick="setOrderFilter('all', this)">All</div>
+                <div class="filter-pill" data-filter="Pending" onclick="setOrderFilter('Pending', this)">Pending</div>
+                <div class="filter-pill" data-filter="Accepted" onclick="setOrderFilter('Accepted', this)">Accepted</div>
+                <div class="filter-pill" data-filter="Delivered" onclick="setOrderFilter('Delivered', this)">Delivered</div>
+                <div class="filter-pill" data-filter="Rejected" onclick="setOrderFilter('Rejected', this)">Rejected</div>
+            </div>
+            <div class="orders-list" id="ordersList"></div>
+        </div>
+
+        <!-- ── TAB 3: EARNINGS ── -->
+        <div id="earningsTab" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Earnings</h2>
+                    <div class="section-header-meta">Total revenue from delivered orders</div>
+                </div>
+            </div>
+            <div id="earningsContent"></div>
+        </div>
+
+        <!-- ── TAB 4: ACTIVE ORDERS ── -->
+        <div id="activeTab" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Active Orders</h2>
+                    <div class="section-header-meta">Manage pending & in-progress orders</div>
+                </div>
+            </div>
+            <div class="orders-list" id="activeList"></div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══════════════ MOBILE BOTTOM NAV ══════════════ -->
+<nav class="mobile-nav">
+    <div class="mobile-nav-item active" data-tab="inventory" onclick="switchTab('inventory')">
+        <i class="fa-solid fa-box-open"></i>
+        <div class="mobile-nav-label">Inventory</div>
+    </div>
+    <div class="mobile-nav-item" data-tab="orders" onclick="switchTab('orders')">
+        <i class="fa-solid fa-receipt"></i>
+        <div class="mobile-nav-label">Orders</div>
+    </div>
+    <div class="mobile-nav-item" data-tab="earnings" onclick="switchTab('earnings')">
+        <i class="fa-solid fa-rupee-sign"></i>
+        <div class="mobile-nav-label">Earnings</div>
+    </div>
+    <div class="mobile-nav-item" data-tab="active" onclick="switchTab('active')">
+        <i class="fa-solid fa-truck-fast"></i>
+        <div class="mobile-nav-label">Active</div>
+        <div class="mobile-nav-badge" id="mobileNavBadge">0</div>
+    </div>
+</nav>
+
+<!-- ══════════════ ADD/EDIT PRODUCT MODAL ══════════════ -->
+<div class="modal-overlay" id="productModal" onclick="closeProductModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modalTitle"><i class="fa-solid fa-box-open"></i> Add New Product</h3>
+            <button class="modal-close" onclick="closeProductModal(event)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <!-- Form Column -->
+            <form class="form-col" id="productForm" onsubmit="handleProductSubmit(event)">
+                <input type="hidden" id="productId">
+                
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" class="form-control" placeholder="e.g. Fresh Tomatoes" required oninput="updateLivePreview()">
+                </div>
+                
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="productPrice">Price (₹)</label>
+                        <input type="number" id="productPrice" class="form-control" placeholder="e.g. 40" min="0" required oninput="updateLivePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label for="productQty">Available Stock</label>
+                        <input type="number" id="productQty" class="form-control" placeholder="e.g. 25" min="0" required oninput="updateLivePreview()">
+                    </div>
+                </div>
+                
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label for="productUnit">Unit</label>
+                        <select id="productUnit" class="form-control" required onchange="updateLivePreview()">
+                            <option value="kg">kg (Kilogram)</option>
+                            <option value="litre">litre (Litre)</option>
+                            <option value="packet">packet (Packet)</option>
+                            <option value="piece">piece (Piece)</option>
+                            <option value="dozen">dozen (Dozen)</option>
+                            <option value="gram">gram (Gram)</option>
+                            <option value="ml">ml (Milliliter)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productEmojiInput">Custom Emoji</label>
+                        <input type="text" id="productEmojiInput" class="form-control" placeholder="e.g. 🍅" maxlength="4" oninput="selectCustomEmoji(this.value)">
+                    </div>
+                </div>
+
+                <!-- Image Upload Section -->
+                <div class="form-group">
+                    <label>Product Image <span style="text-transform:none;font-weight:500;color:var(--text-muted);">(optional)</span></label>
+                    <input type="file" id="productImageInput" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
+                    <div class="image-upload-zone" id="imageUploadZone" onclick="document.getElementById('productImageInput').click()">
+                        <div class="image-upload-placeholder" id="imageUploadPlaceholder">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click or drag an image here</span>
+                            <span class="image-upload-hint">JPG, PNG, WEBP — max 2 MB</span>
+                        </div>
+                        <div class="image-upload-preview" id="imageUploadPreview" style="display:none;">
+                            <img id="imagePreviewImg" src="" alt="Preview">
+                            <button type="button" class="image-remove-btn" onclick="removeProductImage(event)" title="Remove image">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group emoji-selector-wrapper">
+                    <label>Fallback Icon <span style="text-transform:none;font-weight:500;color:var(--text-muted);">(used if no image)</span></label>
+                    <div class="emoji-grid" id="modalEmojiGrid">
+                        <div class="emoji-btn selected" onclick="selectSuggestedEmoji('🍎', this)">🍎</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🥦', this)">🥦</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🥛', this)">🥛</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🍞', this)">🍞</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🥚', this)">🥚</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🍚', this)">🍚</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🫘', this)">🫘</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🍬', this)">🍬</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🫒', this)">🫒</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('☕', this)">☕</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🧈', this)">🧈</div>
+                        <div class="emoji-btn" onclick="selectSuggestedEmoji('🧂', this)">🧂</div>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Live Preview Column -->
+            <div class="preview-col">
+                <div class="preview-label">Live Preview</div>
+                <div id="livePreviewContainer">
+                    <!-- Dynamic preview loaded by JS -->
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-footer-left">
+                <button type="button" class="btn btn-delete" id="deleteProductBtn" onclick="handleProductDelete()" style="display: none;">
+                    <i class="fa-solid fa-trash-can"></i> Delete Product
+                </button>
+            </div>
+            <div class="modal-footer-right">
+                <button type="button" class="btn btn-secondary" onclick="closeProductModal(event)">Cancel</button>
+                <button type="submit" form="productForm" class="btn btn-accept" id="saveProductBtn">Save Product</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="shopkeeper.js" defer></script>
+</body>
+</html>
