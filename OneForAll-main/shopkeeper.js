@@ -6,6 +6,7 @@ const USE_MOCK_API = false;
 const API_BASE_URL = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://127.0.0.1:8000/api/v1'
     : window.location.origin + '/api/v1';
+const API_ROOT_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
 // Initial fallback inventory with stock levels and units
 const DEFAULT_INVENTORY = [
@@ -64,6 +65,37 @@ class ApiService {
             showToast(`Backend connection failed. Check your Python API!`, 'danger');
             throw error;
         }
+    }
+
+    static async uploadProductImage(file) {
+        const authToken = localStorage.getItem('freshmart_session') || sessionStorage.getItem('freshmart_session');
+        let parsedSession = null;
+        try {
+            parsedSession = authToken ? JSON.parse(authToken) : null;
+        } catch (error) {
+            console.warn('Invalid session JSON:', error);
+        }
+
+        const headers = {
+            ...(parsedSession?.token ? { Authorization: `Bearer ${parsedSession.token}` } : {})
+        };
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`${API_ROOT_URL}/upload-image`, {
+            method: 'POST',
+            headers,
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `Upload failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.url;
     }
 
     // Get all inventory
@@ -193,7 +225,8 @@ let stockFilter = 'all'; // 'all' | 'in' | 'out'
 let currentOrderFilter = 'all';
 let searchQuery = '';
 let selectedEmoji = '🍎'; // default for forms
-let selectedImage = null;  // base64 data URL for product image
+let selectedImage = null;  // image URL or preview data URL for product image
+let selectedImageFile = null; // actual file selected for backend upload
 
 const customerNames = ['Rajesh','Priya','Amit','Neha','Vikram','Anjali','Rohan','Zara','Suresh','Divya','Kiran','Meera'];
 const STEPS = ['Accepted','Packing','Out for Delivery','Delivered'];
@@ -470,6 +503,8 @@ function handleImageSelect(event) {
 }
 
 function processImageFile(file) {
+    selectedImageFile = file;
+
     if (!file.type.startsWith('image/')) {
         showToast('Please select a valid image file', 'danger');
         return;
@@ -515,6 +550,7 @@ function showImagePreview(dataUrl) {
 function removeProductImage(event) {
     event.stopPropagation();
     selectedImage = null;
+    selectedImageFile = null;
     const placeholder = document.getElementById('imageUploadPlaceholder');
     const preview = document.getElementById('imageUploadPreview');
     const fileInput = document.getElementById('productImageInput');
@@ -526,6 +562,7 @@ function removeProductImage(event) {
 
 function resetImageUploadUI() {
     selectedImage = null;
+    selectedImageFile = null;
     const placeholder = document.getElementById('imageUploadPlaceholder');
     const preview = document.getElementById('imageUploadPreview');
     const fileInput = document.getElementById('productImageInput');
@@ -601,17 +638,29 @@ async function handleProductSubmit(event) {
     const unit = document.getElementById('productUnit').value;
     const inStock = quantity > 0;
     
-    const productPayload = {
-        name,
-        price,
-        quantity,
-        unit,
-        emoji: selectedEmoji,
-        image: selectedImage || null,
-        inStock
-    };
-    
     try {
+        let imageUrl = null;
+        if (selectedImageFile) {
+            showToast('Uploading image…', 'info');
+            imageUrl = await ApiService.uploadProductImage(selectedImageFile);
+            showToast('Image uploaded successfully', 'success');
+        } else if (selectedImage && !selectedImage.startsWith('data:image/')) {
+            imageUrl = selectedImage;
+        } else if (idVal) {
+            const existingItem = inventory.find(item => item.id === Number(idVal));
+            imageUrl = existingItem?.image || null;
+        }
+
+        const productPayload = {
+            name,
+            price,
+            quantity,
+            unit,
+            emoji: selectedEmoji,
+            image: imageUrl,
+            inStock
+        };
+
         if (idVal) {
             // Edit mode
             const id = Number(idVal);

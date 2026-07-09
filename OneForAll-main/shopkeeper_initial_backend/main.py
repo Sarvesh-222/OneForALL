@@ -1,17 +1,24 @@
 import json
 import os
+import shutil
 import sys
 from decimal import Decimal
 from typing import Any
+from uuid import uuid4
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
+
+UPLOAD_ROOT = os.path.join(PROJECT_ROOT, "uploads")
+UPLOAD_IMAGE_DIR = os.path.join(UPLOAD_ROOT, "images")
+os.makedirs(UPLOAD_IMAGE_DIR, exist_ok=True)
 
 from shopkeeper_initial_backend.auth import create_token, hash_password, verify_password
 from shopkeeper_initial_backend.database import SessionLocal
@@ -28,6 +35,7 @@ from shopkeeper_initial_backend.schemas import (
 )
 
 app = FastAPI(title="Shopkeeper Initial Backend")
+app.mount("/uploads", StaticFiles(directory=UPLOAD_ROOT), name="uploads")
 
 # Create tables (do NOT drop existing data)
 Base.metadata.create_all(bind=SessionLocal.kw["bind"])
@@ -237,6 +245,31 @@ def create_shop_product(payload: ProductCreate, db: Session = Depends(get_db)):
     except Exception as exc:
         db.rollback()
         return {"error": str(exc)}
+
+
+@app.post("/upload-image")
+async def upload_image(
+    file: UploadFile = File(...),
+    shopkeeper=Depends(get_current_shopkeeper),
+    request: Request = None,
+):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file selected")
+
+    extension = os.path.splitext(file.filename)[1].lower()
+    if extension not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
+        raise HTTPException(status_code=400, detail="Only image files are supported")
+
+    filename = f"{uuid4().hex}{extension}"
+    destination = os.path.join(UPLOAD_IMAGE_DIR, filename)
+    try:
+        with open(destination, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    finally:
+        file.file.close()
+
+    base_url = str(request.base_url).rstrip("/")
+    return {"url": f"{base_url}/uploads/images/{filename}"}
 
 
 @app.get("/products", response_model=list[ProductResponse])

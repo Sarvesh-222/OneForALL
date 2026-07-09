@@ -7,6 +7,22 @@ const defaultGroceryProducts = [
     { id: 6, name: "Wheat Flour", price: 50.00, image: "images/Wheat Flour.jpeg", badge: "STAPLE", category: "Pantry", dietary: ["Vegetarian", "Vegan"], inStock: true }
 ];
 
+function normalizeProductForCustomer(item) {
+    const fallback = defaultGroceryProducts.find(def => def.name.toLowerCase() === String(item.name || '').toLowerCase()) || defaultGroceryProducts[0];
+    return {
+        id: item.id,
+        name: item.name,
+        price: Number(item.price ?? 0),
+        image: item.image || fallback.image,
+        badge: fallback.badge || 'FRESH',
+        category: fallback.category || 'Pantry',
+        dietary: fallback.dietary || ['Vegetarian'],
+        inStock: item.inStock ?? item.is_available ?? (Number(item.stock_quantity || 0) > 0),
+        stock_quantity: item.stock_quantity ?? (item.inStock ? 10 : 0),
+        shop_id: item.shop_id ?? 1
+    };
+}
+
 let products = [];
 
 let cart = [];
@@ -28,32 +44,12 @@ const API_BASE_URL = 'http://127.0.0.1:8000';
 
 async function fetchProductsFromDB() {
     try {
-        const response = await fetch(`${API_BASE_URL}/get-product`);
+        const response = await fetch(`${API_BASE_URL}/api/v1/inventory`);
         if (!response.ok) throw new Error('Network response was not ok');
-        let dbProducts = await response.json();
-        
-        let groceryDbProducts = dbProducts.filter(p => p.shop_id === 2);
-        
-        products = defaultGroceryProducts.map(def => {
-            const dbProd = groceryDbProducts.find(p => p.name.toLowerCase() === def.name.toLowerCase());
-            if (dbProd) {
-                return {
-                    ...def,
-                    id: dbProd.id,
-                    price: parseFloat(dbProd.price),
-                    inStock: dbProd.is_available && dbProd.stock_quantity > 0,
-                    stock_quantity: dbProd.stock_quantity,
-                    shop_id: dbProd.shop_id
-                };
-            } else {
-                return {
-                    ...def,
-                    stock_quantity: 10,
-                    shop_id: 2,
-                    inStock: true
-                };
-            }
-        });
+        const dbProducts = await response.json();
+
+        const normalizedProducts = (dbProducts || []).map(normalizeProductForCustomer);
+        products = normalizedProducts.length > 0 ? normalizedProducts : JSON.parse(JSON.stringify(defaultGroceryProducts));
     } catch (error) {
         console.error("Failed to fetch products from DB, falling back to defaults", error);
         products = JSON.parse(JSON.stringify(defaultGroceryProducts));
